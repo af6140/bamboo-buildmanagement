@@ -46,10 +46,13 @@ public class DynamicTaskManager implements TaskType{
         String activateTasks = configurationMap.get(DynamicTaskManagerConfigurator.DYNMGR_TASKS_ACTIVATE);
         String deactivateTasks = configurationMap.get(DynamicTaskManagerConfigurator.DYNMGR_TASKS_DEACTIVATE);
 
-        RegexValidator deactivateValidator = new RegexValidator(deactivateTasks);
-        RegexValidator activateValidator = new RegexValidator(activateTasks);
+        RegexValidator deactivateValidator = null;
+        if (StringUtils.isNotBlank(deactivateTasks))
+            deactivateValidator= new RegexValidator(deactivateTasks);
+        RegexValidator activateValidator = null;
+        if (StringUtils.isNotBlank(activateTasks))
+            activateValidator= new RegexValidator(activateTasks);
 
-        Map<String, String> customVariables = this.customVariableContext.getVariables(taskContext.getCommonContext());
         Map<String, VariableDefinitionContext> variables = this.customVariableContext.getVariableContexts();
         //Map<String, VariableDefinitionContext> variables = taskContext.getBuildContext().getVariableContext().getEffectiveVariables();
         Collection<VariableDefinitionContext> existingVariables =variables.values();
@@ -57,22 +60,28 @@ public class DynamicTaskManager implements TaskType{
         for(VariableDefinitionContext vcontext :existingVariables) {
             String key = vcontext.getKey();
             String value = vcontext.getValue();
-            buildLogger.addBuildLogEntry("Variable Context: "+key+"="+value);
+            //buildLogger.addBuildLogEntry("Variable Context: "+key+"="+value);
             passVariables.put(key,value);
         }
 
         boolean isToDeactivate=false;
-        isToDeactivate=GroovyUtil.eval(passVariables,deActivateExpr);
+        if (StringUtils.isNotBlank(deActivateExpr)) {
+            buildLogger.addBuildLogEntry("Evaluating groovy logical expression: " +deActivateExpr);
+            isToDeactivate = GroovyUtil.eval(passVariables, deActivateExpr);
+        }
 
         boolean isToActivate=false;
-        isToActivate=GroovyUtil.eval(passVariables,activateExpr);
-
+        if (StringUtils.isNotBlank(activateExpr)) {
+            buildLogger.addBuildLogEntry("Evaluating groovy logical expression: " +deActivateExpr);
+            isToActivate=GroovyUtil.eval(passVariables,activateExpr);
+        }
 
         //TaskConfigurationServiceImpl.setTaskState
+        //This get task list after/include current task
         List<RuntimeTaskDefinition> definitions=taskContext.getBuildContext().getRuntimeTaskDefinitions();
         for (RuntimeTaskDefinition def :definitions) {
             String taskDescription = def.getUserDescription();
-            //buildLogger.addBuildLogEntry("task description: " + taskDescription);
+            buildLogger.addBuildLogEntry("task description: " + taskDescription);
             //if(taskDescription.equalsIgnoreCase("TestBash")) def.setEnabled(false);
             if (isToDeactivate) {
                 if (deactivateValidator.isValid(taskDescription) && def.isEnabled() ) {
@@ -88,7 +97,6 @@ public class DynamicTaskManager implements TaskType{
                 }
             }
         }
-
 
         return success(taskContext);
     }

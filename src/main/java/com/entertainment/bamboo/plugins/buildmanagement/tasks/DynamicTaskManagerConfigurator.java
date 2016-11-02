@@ -7,6 +7,7 @@ import com.atlassian.bamboo.task.TaskDefinition;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,18 +52,35 @@ public class DynamicTaskManagerConfigurator extends AbstractTaskConfigurator{
     public void validate(@NotNull final ActionParametersMap params, @NotNull final ErrorCollection errorCollection) {
         super.validate(params, errorCollection);
 
-        String activateExpr = params.getString(DYNMGR_ACTIVE_EXPR);
-        try {
-            Pattern.compile(activateExpr);
-        } catch (PatternSyntaxException e) {
-            errorCollection.addError(DYNMGR_ACTIVE_EXPR, "Not a valid regex: " +e.getDescription());
+        boolean activateTasks = params.getBoolean(DYNMGR_TASKS_ACTIVATE);
+
+        if (activateTasks) {
+            String activateExpr = params.getString(DYNMGR_ACTIVE_EXPR);
+
+            if (StringUtils.isEmpty(activateExpr)) {
+                errorCollection.addError(DYNMGR_ACTIVE_EXPR, "Regex is empty");
+            } else {
+                try {
+                    Pattern.compile(activateExpr);
+                } catch (PatternSyntaxException e) {
+                    errorCollection.addError(DYNMGR_ACTIVE_EXPR, "Not a valid regex: " + e.getDescription());
+                }
+            }
         }
 
-        String deactivateExpr = params.getString(DYNMGR_DEACTIVE_EXPR);
-        try {
-            Pattern.compile(deactivateExpr);
-        } catch (PatternSyntaxException e) {
-            errorCollection.addError(DYNMGR_DEACTIVE_EXPR, "Not a valid regex:" + e.getDescription());
+        boolean deactivateTasks = params.getBoolean(DYNMGR_TASKS_DEACTIVATE);
+
+        if(deactivateTasks) {
+            String deactivateExpr = params.getString(DYNMGR_DEACTIVE_EXPR);
+            if(StringUtils.isEmpty(deactivateExpr)) {
+                errorCollection.addError(DYNMGR_DEACTIVE_EXPR, "Regex is empty");
+            }else {
+                try {
+                    Pattern.compile(deactivateExpr);
+                } catch (PatternSyntaxException e) {
+                    errorCollection.addError(DYNMGR_DEACTIVE_EXPR, "Not a valid regex:" + e.getDescription());
+                }
+            }
         }
     }
     @Override
