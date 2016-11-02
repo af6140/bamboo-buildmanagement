@@ -33,5 +33,19 @@
         <resource type="freemarker" name="view" location="com/entertainment/bamboo/plugins/buildmanagement/templates/dynamicTaskView.ftl"/>
         <resource type="download" name="icon" location="com/entertainment/bamboo/plugins/buildmanagement/images/logo.png" />
     </taskType>
+
+    <taskType name="Stop Build At Current Stage" class="com.entertainment.bamboo.plugins.buildmanagement.tasks.StopBuildManager" key="stopBuildManager">
+        <description>Dynamically stop build at current stage.</description>
+        <!-- Categories available in 3.1: "builder", "test" and "deployment"
+        -->
+        <category name="builder"/>
+        <category name="deployment"/>
+        <category name="test"/>
+
+        <configuration class="com.entertainment.bamboo.plugins.buildmanagement.tasks.StopBuildManagerConfigurator"/>
+        <resource type="freemarker" name="edit" location="com/entertainment/bamboo/plugins/buildmanagement/templates/stopBuildView.ftl"/>
+        <resource type="freemarker" name="view" location="com/entertainment/bamboo/plugins/buildmanagement/templates/stopBuildView.ftl"/>
+        <resource type="download" name="icon" location="com/entertainment/bamboo/plugins/buildmanagement/images/logo.png" />
+    </taskType>
     
 </atlassian-plugin>

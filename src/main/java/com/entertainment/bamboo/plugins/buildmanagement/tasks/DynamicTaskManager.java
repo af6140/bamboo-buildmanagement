@@ -1,7 +1,10 @@
 package com.entertainment.bamboo.plugins.buildmanagement.tasks;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
+import com.atlassian.bamboo.chains.ChainExecutionManager;
 import com.atlassian.bamboo.configuration.ConfigurationMap;
+import com.atlassian.bamboo.plan.PlanExecutionManager;
+import com.atlassian.bamboo.plan.PlanResultKey;
 import com.atlassian.bamboo.task.*;
 import com.atlassian.bamboo.task.runtime.RuntimeTaskDefinition;
 import com.atlassian.bamboo.variable.CustomVariableContext;
@@ -31,15 +34,18 @@ public class DynamicTaskManager implements TaskType{
     @ComponentImport
     private CustomVariableContext customVariableContext;
 
+    @ComponentImport
+    private PlanExecutionManager planExecutionManager;
 
-    public DynamicTaskManager(@NotNull final CustomVariableContext customVariableContext) {
+    public DynamicTaskManager(@NotNull final CustomVariableContext customVariableContext, @NotNull final PlanExecutionManager planExecutionManager) {
         this.customVariableContext=customVariableContext;
+        this.planExecutionManager= planExecutionManager;
     }
     @NotNull
     public TaskResult execute(@NotNull TaskContext taskContext) throws TaskException {
         final BuildLogger buildLogger = taskContext.getBuildLogger();
         ConfigurationMap configurationMap = taskContext.getConfigurationMap();
-
+        PlanResultKey planResultKey=taskContext.getBuildContext().getPlanResultKey();
 
         String deActivateExpr = configurationMap.get(DynamicTaskManagerConfigurator.DYNMGR_DEACTIVE_EXPR);
         String activateExpr = configurationMap.get(DynamicTaskManagerConfigurator.DYNMGR_ACTIVE_EXPR);
@@ -98,6 +104,7 @@ public class DynamicTaskManager implements TaskType{
             }
         }
 
+        //this.planExecutionManager.stopPlan(planResultKey,false, "admin");
         return success(taskContext);
     }
     public TaskResult success(TaskContext taskContext) {
