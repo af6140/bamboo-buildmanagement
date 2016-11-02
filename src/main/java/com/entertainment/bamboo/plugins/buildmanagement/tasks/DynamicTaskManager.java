@@ -46,11 +46,6 @@ public class DynamicTaskManager implements TaskType{
         String activateTasks = configurationMap.get(DynamicTaskManagerConfigurator.DYNMGR_TASKS_ACTIVATE);
         String deactivateTasks = configurationMap.get(DynamicTaskManagerConfigurator.DYNMGR_TASKS_DEACTIVATE);
 
-//        String [] activateTaskNames = StringUtils.splitByWholeSeparator(activateTasks, ",");
-//        String [] deActivateTaskNames = StringUtils.splitByWholeSeparator(deactivateTasks, ",");
-//        activateTaskNames = StringUtils.stripAll(activateTaskNames);
-//        deActivateTaskNames = StringUtils.stripAll(deActivateTaskNames);
-
         RegexValidator deactivateValidator = new RegexValidator(deactivateTasks);
         RegexValidator activateValidator = new RegexValidator(activateTasks);
 
@@ -67,10 +62,10 @@ public class DynamicTaskManager implements TaskType{
         }
 
         boolean isToDeactivate=false;
-        //isToDeactivate=GroovyUtil.eval(passVariables,deActivateExpr);
+        isToDeactivate=GroovyUtil.eval(passVariables,deActivateExpr);
 
         boolean isToActivate=false;
-        //isToActivate=GroovyUtil.eval(passVariables,activateExpr);
+        isToActivate=GroovyUtil.eval(passVariables,activateExpr);
 
 
         //TaskConfigurationServiceImpl.setTaskState

@@ -55,14 +55,14 @@ public class DynamicTaskManagerConfigurator extends AbstractTaskConfigurator{
         try {
             Pattern.compile(activateExpr);
         } catch (PatternSyntaxException e) {
-            errorCollection.addError(DYNMGR_ACTIVE_EXPR, "Not a valid regex!");
+            errorCollection.addError(DYNMGR_ACTIVE_EXPR, "Not a valid regex: " +e.getDescription());
         }
 
         String deactivateExpr = params.getString(DYNMGR_DEACTIVE_EXPR);
         try {
             Pattern.compile(deactivateExpr);
         } catch (PatternSyntaxException e) {
-            errorCollection.addError(DYNMGR_DEACTIVE_EXPR, "Not a valid regex!");
+            errorCollection.addError(DYNMGR_DEACTIVE_EXPR, "Not a valid regex:" + e.getDescription());
         }
     }
     @Override
